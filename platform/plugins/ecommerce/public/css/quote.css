@@ -1,0 +1,31 @@
+/* Quote Table Header Styling */
+table.quotes-table thead th,
+.quotes-table thead th,
+#table_quotes_table_wrapper table thead th,
+table.dataTable.quotes-table thead th {
+    background-color: #4a5568 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    padding: 12px 15px !important;
+    border-bottom: 2px solid #2d3748 !important;
+}
+
+table.quotes-table thead th a,
+.quotes-table thead th a,
+#table_quotes_table_wrapper table thead th a,
+table.dataTable.quotes-table thead th a {
+    color: #ffffff !important;
+}
+
+table.quotes-table thead th:hover,
+.quotes-table thead th:hover,
+#table_quotes_table_wrapper table thead th:hover,
+table.dataTable.quotes-table thead th:hover {
+    background-color: #2d3748 !important;
+}
+
+table.quotes-table thead th.sorting:before,
+table.quotes-table thead th.sorting_asc:before,
+table.quotes-table thead th.sorting_desc:before {
+    color: #ffffff !important;
+}
