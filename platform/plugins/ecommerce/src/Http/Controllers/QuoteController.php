@@ -144,6 +144,19 @@ class QuoteController extends BaseController
         try {
             $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
 
+            // Check if template is enabled
+            if (!$mailer->templateEnabled('quote_rejected')) {
+                BaseHelper::logError('Quote rejection email template is not enabled');
+                return;
+            }
+
+            // Check if template has content (prevents DOMDocument::loadHTML() error)
+            $templateContent = $mailer->getTemplateContent('quote_rejected');
+            if (empty(trim($templateContent ?? ''))) {
+                BaseHelper::logError('Quote rejection email template has no content. Please configure the email template in Settings > Email Templates.');
+                return;
+            }
+
             // Set email variables
             $mailer->setVariableValues([
                 'customer_name' => $quote->customer->name,
@@ -156,8 +169,9 @@ class QuoteController extends BaseController
             ]);
 
             $mailer->sendUsingTemplate('quote_rejected', $quote->customer->email);
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             BaseHelper::logError($exception);
+            // Don't throw - fail silently to not break the quote update process
         }
     }
 

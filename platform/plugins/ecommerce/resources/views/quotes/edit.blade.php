@@ -115,7 +115,7 @@
                     </x-core::button>
 
                     <x-core::button
-                        type="button"
+                        tag="a"
                         :href="route('quotes.index')"
                     >
                         {{ trans('core/base::forms.cancel') }}

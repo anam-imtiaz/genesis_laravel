@@ -153,7 +153,7 @@
                 });
             }
             
-            // Update quote dropdown content
+            // Update quote dropdown content and open drawer
             if (data.data && data.data.html) {
                 // Find quote dropdown - it's the .ps-cart--mobile sibling of .btn-quote
                 document.querySelectorAll('.btn-quote').forEach(btn => {
@@ -167,6 +167,86 @@
                             if (typeof Theme !== 'undefined' && Theme.lazyLoadInstance) {
                                 Theme.lazyLoadInstance.update();
                             }
+                            
+                            // Scroll to quote icon if not visible
+                            const rect = btn.getBoundingClientRect();
+                            const isVisible = rect.top >= 0 && rect.left >= 0 && 
+                                            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && 
+                                            rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+                            
+                            if (!isVisible) {
+                                btn.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+                            }
+                            
+                            // Open the quote drawer automatically
+                            // Add active class to trigger drawer opening
+                            cartMini.classList.add('active', 'quote-drawer-open');
+                            
+                            // Ensure dropdown is visible
+                            dropdown.style.display = 'block';
+                            dropdown.style.opacity = '1';
+                            dropdown.style.visibility = 'visible';
+                            dropdown.style.zIndex = '9999';
+                            
+                            // Trigger hover event using jQuery if available (more reliable)
+                            if (typeof jQuery !== 'undefined') {
+                                jQuery(cartMini).addClass('hover').trigger('mouseenter');
+                            } else {
+                                // Fallback: trigger native mouseenter event
+                                const mouseEnterEvent = new MouseEvent('mouseenter', {
+                                    view: window,
+                                    bubbles: true,
+                                    cancelable: true
+                                });
+                                cartMini.dispatchEvent(mouseEnterEvent);
+                            }
+                            
+                            // Set up auto-close after 5 seconds or on mouseleave (only if not hovering)
+                            let autoCloseTimeout;
+                            let isHovering = false;
+                            
+                            const closeDrawer = () => {
+                                if (!isHovering) {
+                                    cartMini.classList.remove('active', 'quote-drawer-open', 'hover');
+                                    if (typeof jQuery !== 'undefined') {
+                                        jQuery(cartMini).removeClass('hover');
+                                    }
+                                    // Reset inline styles to let CSS hover handle it
+                                    dropdown.style.display = '';
+                                    dropdown.style.opacity = '';
+                                    dropdown.style.visibility = '';
+                                    dropdown.style.zIndex = '';
+                                }
+                                clearTimeout(autoCloseTimeout);
+                            };
+                            
+                            // Auto-close after 5 seconds if not hovering
+                            autoCloseTimeout = setTimeout(() => {
+                                if (!isHovering) {
+                                    closeDrawer();
+                                }
+                            }, 5000);
+                            
+                            // Track hover state
+                            const handleMouseEnter = () => {
+                                isHovering = true;
+                                clearTimeout(autoCloseTimeout);
+                            };
+                            
+                            const handleMouseLeave = () => {
+                                isHovering = false;
+                                // Close after a short delay when mouse leaves
+                                setTimeout(() => {
+                                    if (!isHovering) {
+                                        closeDrawer();
+                                    }
+                                }, 300);
+                            };
+                            
+                            cartMini.addEventListener('mouseenter', handleMouseEnter);
+                            cartMini.addEventListener('mouseleave', handleMouseLeave);
+                            dropdown.addEventListener('mouseenter', handleMouseEnter);
+                            dropdown.addEventListener('mouseleave', handleMouseLeave);
                         }
                     }
                 });

@@ -32,3 +32,13 @@ table.quotes-table thead th.sorting_asc:before,
 table.quotes-table thead th.sorting_desc:before {
     color: #ffffff !important;
 }
+
+/* Quote Drawer Auto-Open Styling */
+.ps-cart--mini.quote-drawer-open .ps-cart--mobile,
+.ps-cart--mini.active .ps-cart--mobile,
+.ps-cart--mini:hover .ps-cart--mobile {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 9999 !important;
+}
