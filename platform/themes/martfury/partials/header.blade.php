@@ -57,7 +57,7 @@
                                     <a class="header__extra btn-compare" href="{{ route('public.compare') }}"><i class="icon-chart-bars"></i><span><i>{{ Cart::instance('compare')->count() }}</i></span></a>
                                 @endif
                                 <div class="ps-cart--mini">
-                                    <a class="header__extra btn-quote" href="{{ route('public.quote.basket') }}"><i class="icon-bag2"></i><span><i>{{ Cart::instance('quote')->count() }}</i></span></a>
+                                    <a class="header__extra btn-quote" href="{{ route('public.quote.basket') }}"><img src="{{ Theme::asset()->url('img/quotation-icon.png') }}" alt="{{ __('Quote Basket') }}" style="width: 30px; height: 30px; vertical-align: middle;"><span><i>{{ Cart::instance('quote')->count() }}</i></span></a>
                                     <div class="ps-cart--mobile">
                                         {!! Theme::partial('quote') !!}
                                     </div>

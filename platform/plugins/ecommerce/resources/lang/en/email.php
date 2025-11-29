@@ -90,4 +90,7 @@ return [
     'product_file_updated_title' => 'Product File Updated',
     'product_file_updated_description' => 'Notify customer when the product files are updated',
     'product_file_updated_subject' => 'Product files updated for order {{ order_id }}',
+    'quote_rejected_title' => 'Quote Request Rejected',
+    'quote_rejected_description' => 'Send to customer when their quote request is rejected',
+    'quote_rejected_subject' => 'Your quote request {{ quote_code }} has been rejected',
 ];

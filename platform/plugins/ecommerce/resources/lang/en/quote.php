@@ -19,6 +19,8 @@ return [
     'list' => 'Quote List',
     'create' => 'Create Quote',
     'edit' => 'Edit Quote',
+    'edit_quote' => 'Edit Quote :code',
+    'assigned_to' => 'Assigned To',
     'delete' => 'Delete Quote',
     'view' => 'View Quote',
     'actions' => 'Actions',

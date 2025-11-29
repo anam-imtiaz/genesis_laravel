@@ -31,6 +31,7 @@ class QuoteTable extends TableAbstract
     {
         $this
             ->model(Quote::class)
+           
             ->setOption('class', 'quotes-table')
             ->addColumns([
                 IdColumn::make(),
@@ -54,7 +55,18 @@ class QuoteTable extends TableAbstract
             ])
             ->addActions([
                 EditAction::make()->route('quotes.edit'),
-                DeleteAction::make()->route('quotes.destroy'),
+                DeleteAction::make()
+                    ->route('quotes.destroy') // Ensure the correct route is used
+                    ->label('Remove Item') // Change the button text
+                    ->icon('fa fa-trash-alt') // Change the icon
+                    ->permission('quotes.destroy') // Change the permission requirement
+                    ->attributes([
+                        'class' => 'btn btn-danger delete-item-custom', // Add custom CSS class
+                        'data-toggle' => 'tooltip',
+                        'data-original-title' => 'Delete this item', // Custom tooltip
+                        'data-parent-table' => $this->getTableId(),
+                    ])
+                //DeleteAction::make()->route('quotes.destroy'),
             ])
             ->addBulkAction(DeleteBulkAction::make())
             ->queryUsing(function (Builder $query): void {
@@ -102,19 +114,8 @@ class QuoteTable extends TableAbstract
                 return format_price($item->total);
             })
             ->editColumn('status', function (Quote $item) {
-                // Display "New" instead of "Pending" for quotes
-                if ($item->status->getValue() === QuoteStatusEnum::NEW) {
-                    return BaseHelper::renderBadge(__('New'), 'warning', icon: 'ti ti-clock');
-                }
-                if ($item->status->getValue() === QuoteStatusEnum::UNDER_REVIEW) {
-                    return BaseHelper::renderBadge(__('Under review'), 'info', icon: 'ti ti-refresh');
-                }
-                if ($item->status->getValue() === QuoteStatusEnum::QUOTED) {
-                    return BaseHelper::renderBadge(__('Quoted'), 'success', icon: 'ti ti-circle-check');
-                }
-                if ($item->status->getValue() === QuoteStatusEnum::APPROVED) {
-                    return BaseHelper::renderBadge(__('Approved'), 'success', icon: 'ti ti-circle-check');
-                }
+                // Use the enum's toHtml method which handles all statuses properly
+                return $item->status->toHtml();
             })
             ->editColumn('created_at', function (Quote $item) {
                 return BaseHelper::formatDate($item->created_at);
@@ -151,5 +152,15 @@ class QuoteTable extends TableAbstract
         return [
            
         ];
+    }
+
+    /**
+     * Get the table ID
+     *
+     * @return string
+     */
+    public function getTableId(): string
+    {
+        return $this->getOption('id');
     }
 }

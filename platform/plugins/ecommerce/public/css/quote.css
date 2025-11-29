@@ -1,4 +1,7 @@
 /* Quote Table Header Styling */
+.quotes-table {
+    width: 100% !important;
+}
 table.quotes-table thead th,
 .quotes-table thead th,
 #table_quotes_table_wrapper table thead th,

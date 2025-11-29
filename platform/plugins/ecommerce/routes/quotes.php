@@ -8,7 +8,11 @@ use Illuminate\Support\Facades\Route;
 AdminHelper::registerRoutes(function (): void {
     Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers', 'prefix' => 'ecommerce'], function (): void {
         Route::group(['prefix' => 'quotes', 'as' => 'quotes.'], function (): void {
-            Route::resource('', 'QuoteController')->parameters(['' => 'quote']);
+            Route::match(['GET', 'POST'], '', ['as' => 'index', 'uses' => 'QuoteController@index']);
+            Route::get('{quote}/edit', ['as' => 'edit', 'uses' => 'QuoteController@edit']);
+            Route::put('{quote}', ['as' => 'update', 'uses' => 'QuoteController@update']);
+            Route::patch('{quote}', ['as' => 'update', 'uses' => 'QuoteController@update']);
+            Route::delete('{quote}', ['as' => 'destroy', 'uses' => 'QuoteController@destroy']);
         });
     });
 });

@@ -6,7 +6,7 @@ use Botble\ACL\Models\User;
 use Botble\Base\Models\BaseModel;
 use Botble\Ecommerce\Enums\OrderAddressTypeEnum;
 use Botble\Ecommerce\Enums\OrderCancellationReasonEnum;
-use Botble\Ecommerce\Enums\OrderStatusEnum;
+use Botble\Ecommerce\Enums\QuoteStatusEnum;
 use Botble\Ecommerce\Enums\ShippingMethodEnum;
 use Botble\Ecommerce\Enums\ShippingStatusEnum;
 use Botble\Ecommerce\Facades\EcommerceHelper;
@@ -40,7 +40,7 @@ class Quote extends BaseModel
     ];
 
     protected $casts = [
-        'status' => OrderStatusEnum::class,
+        'status' => QuoteStatusEnum::class,
     ];
 
     public static function generateUniqueCode(): string

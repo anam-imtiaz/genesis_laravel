@@ -298,5 +298,21 @@ return [
                 'product_files' => 'plugins/ecommerce::ecommerce.product_files',
             ],
         ],
+        'quote_rejected' => [
+            'title' => 'plugins/ecommerce::email.quote_rejected_title',
+            'description' => 'plugins/ecommerce::email.quote_rejected_description',
+            'subject' => 'plugins/ecommerce::email.quote_rejected_subject',
+            'can_off' => true,
+            'enabled' => true,
+            'variables' => [
+                'customer_name' => 'plugins/ecommerce::ecommerce.customer_name',
+                'customer_email' => 'plugins/ecommerce::ecommerce.customer_email',
+                'quote_code' => 'plugins/ecommerce::quote.code',
+                'quote_id' => 'plugins/ecommerce::quote.code',
+                'quote_description' => 'plugins/ecommerce::quote.description',
+                'quote_total' => 'plugins/ecommerce::quote.total',
+                'quote_link' => 'plugins/ecommerce::ecommerce.quote_link',
+            ],
+        ],
     ]),
 ];

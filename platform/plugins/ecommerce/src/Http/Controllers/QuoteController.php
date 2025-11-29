@@ -12,6 +12,7 @@ use Botble\Base\Supports\Breadcrumb;
 use Botble\Ecommerce\Cart\CartItem;
 use Botble\Ecommerce\Enums\OrderHistoryActionEnum;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
+use Botble\Ecommerce\Enums\QuoteStatusEnum;
 use Botble\Ecommerce\Enums\ShippingCodStatusEnum;
 use Botble\Ecommerce\Enums\ShippingMethodEnum;
 use Botble\Ecommerce\Enums\ShippingStatusEnum;
@@ -79,14 +80,96 @@ class QuoteController extends BaseController
     {
         $this->pageTitle(trans('plugins/ecommerce::quote.menu'));
 
-        Assets::addStylesDirectly('vendor/core/plugins/ecommerce/css/quote.css');
+        Assets::addStylesDirectly(['vendor/core/plugins/ecommerce/css/quote.css'])
+            ->addScriptsDirectly('vendor/core/plugins/ecommerce/js/quote.js', 'footer', ['data-quote-script' => 'true']);
 
         return $dataTable->renderTable();
     }
 
+    public function edit(Quote $quote)
+    {
+        $this->pageTitle(trans('plugins/ecommerce::quote.edit_quote', ['code' => $quote->code]));
+
+        Assets::addStylesDirectly(['vendor/core/plugins/ecommerce/css/ecommerce.css']);
+
+        $quote->load(['customer', 'products', 'products.product', 'assignedTo']);
+
+        $statuses = QuoteStatusEnum::labels();
+        $users = User::query()
+            ->orderBy('first_name')
+            ->get()
+            ->mapWithKeys(function ($user) {
+                $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+                return [$user->id => $name ?: $user->email];
+            })
+            ->all();
+
+        return view('plugins/ecommerce::quotes.edit', compact('quote', 'statuses', 'users'));
+    }
+
+    public function update(Quote $quote, Request $request)
+    {
+        $request->validate([
+            'status' => 'required|string',
+            'description' => 'nullable|string|max:1000',
+            'assigned_to_id' => 'nullable|exists:users,id',
+        ]);
+
+        $oldStatus = $quote->status->getValue();
+        $newStatus = $request->input('status');
+
+        $quote->fill($request->only(['status', 'description', 'assigned_to_id']));
+        $quote->save();
+
+        // Send email to customer if status changed to rejected
+        if ($newStatus === QuoteStatusEnum::REJECTED && $oldStatus !== QuoteStatusEnum::REJECTED) {
+            $quote->load(['customer', 'products', 'products.product']);
+            $this->sendQuoteRejectionEmail($quote);
+        }
+
+        event(new UpdatedContentEvent('quote', $request, $quote));
+
+        return $this
+            ->httpResponse()
+            ->setPreviousUrl(route('quotes.index'))
+            ->withUpdatedSuccessMessage();
+    }
+
+    protected function sendQuoteRejectionEmail(Quote $quote): void
+    {
+        if (!$quote->customer || !$quote->customer->email) {
+            return;
+        }
+
+        try {
+            $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
+
+            // Set email variables
+            $mailer->setVariableValues([
+                'customer_name' => $quote->customer->name,
+                'customer_email' => $quote->customer->email,
+                'quote_code' => $quote->code,
+                'quote_id' => $quote->code,
+                'quote_description' => $quote->description ?? '',
+                'quote_total' => format_price($quote->total),
+                'quote_link' => route('public.quote.basket'),
+            ]);
+
+            $mailer->sendUsingTemplate('quote_rejected', $quote->customer->email);
+        } catch (Exception $exception) {
+            BaseHelper::logError($exception);
+        }
+    }
+
     public function destroy(Quote $quote)
     {
-        return DeleteResourceAction::make($quote);
+        return DeleteResourceAction::make($quote)
+            ->afterDeleting(function ($action) {
+                $action->getHttpResponse()->setData([
+                    'reload_table' => true,
+                    'table_id' => 'table_quotes_table',
+                ]);
+            });
     }
 
 }
